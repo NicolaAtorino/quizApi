@@ -18,7 +18,7 @@ func main() {
 
 	router.HandleFunc("/questions", getQuestions).Methods("GET")
 	router.HandleFunc("/answers", insertAnswers).Methods("POST", "OPTIONS")
-	router.HandleFunc("/user/{id}/results", getQuizResults).Methods("GET")
+	router.HandleFunc("/users/{id}/results", getQuizResults).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
