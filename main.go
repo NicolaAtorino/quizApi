@@ -17,13 +17,21 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/questions", getQuestions).Methods("GET")
-	router.HandleFunc("/answers", insertAnswers).Methods("POST")
+	router.HandleFunc("/answers", insertAnswers).Methods("POST", "OPTIONS")
 	router.HandleFunc("/user/{id}/results", getQuizResults).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, HEAD, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
+}
+
 func getQuestions(w http.ResponseWriter, r *http.Request) {
+
+	enableCors(&w)
 
 	questions, err := quizService.GetQuestions()
 
@@ -36,6 +44,13 @@ func getQuestions(w http.ResponseWriter, r *http.Request) {
 }
 
 func insertAnswers(w http.ResponseWriter, r *http.Request) {
+
+	enableCors(&w)
+
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
 	var userAnswerContainer *UserAnswerContainer
 
 	_ = json.NewDecoder(r.Body).Decode(&userAnswerContainer)
@@ -49,6 +64,9 @@ func insertAnswers(w http.ResponseWriter, r *http.Request) {
 }
 
 func getQuizResults(w http.ResponseWriter, r *http.Request) {
+
+	enableCors(&w)
+
 	params := mux.Vars(r)
 
 	userIDStr := params["id"]
